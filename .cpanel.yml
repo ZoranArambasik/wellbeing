@@ -1,0 +1,3 @@
+deployment:
+    tasks:
+        - ./deploy-wordpress-bedrock-code.sh 2>&1

@@ -4,63 +4,283 @@
     <div class="container">
         <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
             <div <?php post_class(); ?> id="post-<?php the_ID(); ?>">  
-
-                <h2 class="posttitle"><?php the_title(); ?></h2>
-                <div class="row places-header mx-auto">
-                    <div class="col-12 p-0 image-full">
-                        <?php echo has_post_thumbnail() ? the_post_thumbnail('single_head_images') : '<img src="' . get_bloginfo( 'stylesheet_directory' )  . '/images/no-image.jpg" />'; ?>
+                <div class="row align-items-center mb-3">
+                    <div class="col-md-8 single-post-title">
+                        <h2 class="posttitle"><?php the_title(); ?></h2>
                     </div>
+                    <div class="col-md-4">
+                        <div class="share-save">
+                            <div id="shareBtn" class="btn btn-success clearfix"><?php _e('Share', 'Wellbeing') ?><img src="<?php bloginfo('template_directory') ?>/images/share-icon.png"></div>
+                            <div class="fav-singles"><span class="save_fv"><?php _e('Favorite', 'Wellbeing') ?></span><?php echo do_shortcode('[favorite_button]'); ?></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row places-header mx-auto">
+                    <?php 
+                    $col = '';
+                    $add_head_images = get_field('add_header_image');
+                    // var_dump($add_head_images['header_image_3']);
+                    if ($add_head_images['header_image_3'] == false && $add_head_images['header_image_2'] == false) {
+                        $col = 'col-12';
+                        $smcol = '';
+                    }
+                    else if ($add_head_images['header_image_3'] == false || $add_head_images['header_image_2'] == false) {
+                        $col = 'col-6';
+                        $smcol = 'col-6 img-ff';
+
+                    }
+                    else {
+                        $col = 'col-8';
+                        $smcol = 'col-4';
+                    } ?>
+                    <div class="<?php echo $col; ?> p-0 image-full max-height">
+                        <?php echo has_post_thumbnail() ? the_post_thumbnail('single_head_images') : '<img src="' . get_bloginfo( 'stylesheet_directory' )  . '/images/no-image.jpg" />'; ?>
+                        <?php if (get_field('photographer_name')): ?>
+                            <div class="photographer-holder">
+                                <div class="photograph-name">
+                                    <?php _e('Photo by ', 'Wellbeing'); the_field('photographer_name'); ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                        
+                    </div>
+                    <?php if (have_rows('add_header_image')) : ?>
+                        <?php while(have_rows('add_header_image')) : the_row(); ?>
+                            <?php $pi2 = get_sub_field('header_image_2'); ?>
+                            <?php $pi3 = get_sub_field('header_image_3'); ?>
+                            <div class="<?php echo $smcol; ?> p-0 image-full max-height">
+                                <?php if (!empty($pi2)): ?>
+                                  <div class="image-two">
+                                    <img src="<?php echo esc_url($pi2['url']); ?>" alt="<?php echo esc_attr($pi2['alt']); ?>" />
+                                    <?php if (get_sub_field('photo_by_two')): ?>
+                                        <div class="photographer-holder">
+                                            <div class="photograph-name">
+                                                <?php _e('Photo by ', 'Wellbeing'); the_sub_field('photo_by_two'); ?>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <?php endif; ?>
+                                <?php if (!empty($pi3)): ?>
+                                <div class="image-three">
+                                    <img src="<?php echo esc_url($pi3['url']); ?>" alt="<?php echo esc_attr($pi3['alt']); ?>" />
+                                    <?php if (get_sub_field('photo_by_three')): ?>
+                                        <div class="photographer-holder">
+                                            <div class="photograph-name">
+                                                <?php _e('Photo by ', 'Wellbeing'); the_sub_field('photo_by_three'); ?>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                            <?php if (have_rows('add_even_more_images')) : ?>
+                              <div class="view-all-photos"><?php _e('View all photos', 'Wellbeing'); ?></div>
+                              <div class="hiden-images-slide">
+                                <div class="slide-images-single-holder">
+                                  <div class="close-popup">X</div>
+                                  <div class="slide-images-singles">
+                                    <?php while(have_rows('add_even_more_images')) : the_row(); ?>
+                                        <?php $piR = get_sub_field('add_image'); ?>
+                                        <?php if ($piR): ?>
+                                            <div class="img-slide-holder">
+                                                <figure>
+                                                    <?php if (get_sub_field('photo_by')): ?>
+                                                    <figcaption>
+                                                        <div class="photographer-holder">
+                                                            <div class="photograph-name">
+                                                                <?php _e('Photo by ', 'Wellbeing'); the_sub_field('photo_by'); ?>
+                                                            </div>
+                                                        </div>
+                                                    </figcaption>
+                                                    <?php endif; ?>
+                                                    <img src="<?php echo esc_url($piR['url']); ?>" alt="<?php echo esc_attr($piR['alt']); ?>">
+                                                    
+                                                </figure>
+                                            </div>
+                                      <?php endif ?>
+                                    <?php endwhile; ?>
+                                    <?php if (has_post_thumbnail()): ?>
+                                       <div class="img-slide-holder">
+                                        <figure>
+                                            <?php if (get_field('photographer_name')): ?>
+                                                <figcaption>
+                                                    <div class="photographer-holder">
+                                                        <div class="photograph-name">
+                                                            <?php _e('Photo by ', 'Wellbeing'); the_field('photographer_name'); ?>
+                                                        </div>
+                                                    </div>
+                                                </figcaption>
+                                            <?php endif; ?>
+                                            <?php the_post_thumbnail('single_head_images'); ?>
+                                            
+                                        </figure>
+                                        </div>
+                                    <?php endif ?>
+                                    <?php if (!empty($pi2)): ?>
+                                       <div class="img-slide-holder">
+                                        <figure>
+                                            <?php if (get_sub_field('photo_by_two')): ?>
+                                                <figcaption>
+                                                    <div class="photographer-holder">
+                                                        <div class="photograph-name">
+                                                            <?php _e('Photo by ', 'Wellbeing'); the_sub_field('photo_by_two'); ?>
+                                                        </div>
+                                                    </div>
+                                                </figcaption>
+                                            <?php endif; ?>
+                                            <img src="<?php echo esc_url($pi2['url']); ?>" alt="<?php echo esc_attr($pi2['alt']); ?>" />
+                                            
+                                        </figure>
+                                        </div>
+                                     <?php endif; ?>
+                                     <?php if (!empty($pi3)): ?>
+                                        <div class="img-slide-holder">
+                                        <figure>
+                                            <?php if (get_sub_field('photo_by_three')): ?>
+                                                <figcaption>
+                                                    <div class="photographer-holder">
+                                                        <div class="photograph-name">
+                                                            <?php _e('Photo by ', 'Wellbeing'); the_sub_field('photo_by_three'); ?>
+                                                        </div>
+                                                    </div>
+                                                </figcaption>
+                                            <?php endif; ?>
+                                            <img src="<?php echo esc_url($pi3['url']); ?>" alt="<?php echo esc_attr($pi3['alt']); ?>" />
+                                            
+                                        </figure>
+                                        </div>
+                                     <?php endif; ?>
+                                  </div>
+                                </div>
+                              </div>
+                            <?php endif; ?>
+                        <?php endwhile; ?>
+                    <?php endif; ?>
                 </div>
                 <div class="row">
                     <div class="col-md-8">
                         <?php if (get_field('hashtag_title')): ?>
                             <h4 class="hash-title"><img src="<?php bloginfo('template_directory') ?>/images/Lotus-red.png"><?php echo get_field('hashtag_title'); ?></h4>
+                        <?php endif; ?>
+                        <?php 
+                        $summary = get_field('summary_introduction_text');
+                            if ($summary) {
+                                echo '<div class="from-single-route-small-description">' . strip_tags($summary) . '</div>';
+                            }  
+                        ?>
+                        <?php if (get_field('company_large_description')): ?>
+                            <div class="lr-company-desc"><?php echo get_field('company_large_description') ?></div>
                         <?php endif ?>
-                    <?php the_content(); ?>
+                        <?php $pdf_icon_and_text = get_field('pdf_icon_and_text'); ?>
+                        <?php if ($pdf_icon_and_text): ?>
+                            <p class="pdf-icon-and-text"><a target="_blank" href="<?php echo $pdf_icon_and_text['url']; ?>"><img alt="PDF Download Image" src="<?php bloginfo('template_directory') ?>/images/ic_download.png"> <span><?php echo $pdf_icon_and_text['title']; ?></span></a></p>
+                        <?php endif; ?>
+                        <?php $link_r = get_field('add_custom_url');
+                        if ($link_r) {
+                            $link_url_r = $link_r['url'];
+                            $link_title_r = $link_r['title'];
+                            $link_target_r = $link_r['target'] ? $link_r['target'] : '_self'; ?>
+                            <p class="custom-route-link">
+                                <a href="<?php echo esc_url( $link_url_r ); ?>" target="<?php echo esc_attr( $link_target_r ); ?>">
+                               <img alt="Custom Link Image" src="<?php bloginfo('template_directory'); ?>/images/ic_link.png">
+                               <span><?php echo $link_title_r; ?></span></a>
+                            </p>
+                        <?php } ?>
                     </div>
-                    <?php  $location = get_field('google_map'); ?>
                     <div class="col-md-4 pl-5 pr-5">
-                        <?php if (have_rows('contact_places')) : ?>
-                            <?php while(have_rows('contact_places')) : the_row(); ?>
-                                <?php 
+                        <?php $location = get_field('google_map'); ?>
+                        <?php if (have_rows('contact_places_company')) : ?>
+                            <?php while(have_rows('contact_places_company')) : the_row(); ?>
+                            <?php 
                                 $phone = get_sub_field('phone');
+                                $phone_two = get_sub_field('phone_two');
                                 $email = get_sub_field('email');
                                 $website = get_sub_field('website');
-                                ?>
-                                <?php if ($phone || $email || $website): ?>
-                                    <h3 class="cont-info"><?php _e('Contact information', 'Wellbeing'); ?></h3>
-                                <?php endif; ?>
-                                <div class="place-info">
-                                    <?php if ($phone): ?>
-                                        <p class="places_phone">
-                                            <i class="fas fa-phone"></i><span><?php echo $phone; ?></span>
-                                        </p>
-                                    <?php endif ?>
-                                    <?php if ($email): ?>
-                                        <p class="email">
-                                            <i class="far fa-envelope"></i><span><a href="mailto:<?php echo $email; ?>"><?php echo $email; ?></a></span>
-                                        </p>
-                                    <?php endif ?>
-                                    <?php if ($website): ?>
-                                        <p class="website">
-                                            <i class="fas fa-globe"></i><span><a href="<?php echo $website; ?>"><?php echo $website; ?></a></span>
-                                        </p>
-                                    <?php endif ?>
-                                    <?php if ($location['address']): ?>
-                                        <p class="map_adress">
-                                            <i class="fas fa-map-marker-alt"></i><span><?php echo $location['address']; ?></span>
-                                        </p>
-                                    <?php endif ?>
-                                </div>
+                                $website_txt = get_sub_field('website_txt');
+                                $facebook = get_sub_field('facebook');
+                                $instagram = get_sub_field('instagram');
+                                $twitter = get_sub_field('twitter');
+                                $linkedin = get_sub_field('linkedin');
+                                $open_season = get_sub_field('open_season');
+                                
+                            ?>
+
+                            <?php if ($phone || $email || $website): ?>
+                                <h3 class="cont-info"><?php _e('Contact information', 'Wellbeing'); ?></h3>
+                            <?php endif; ?>
+                            <div class="place-info">
+                            <?php if ($phone): ?>
+                                <p class="places_phone">
+                                    <i class="fas fa-phone"></i><span><?php echo $phone; ?></span>
+                                </p>
+                            <?php endif ?>
+                            <?php if ($phone_two): ?>
+                                <p class="places_phone">
+                                    <i class="fas fa-phone"></i><span><?php echo $phone_two; ?></span>
+                                </p>
+                            <?php endif ?>
+                            <?php if ($email): ?>
+                                <p class="email">
+                                    <i class="far fa-envelope"></i><span><a href="mailto:<?php echo $email; ?>"><?php echo $email; ?></a></span>
+                                </p>
+                            <?php endif ?>
+                            <?php if ($website): ?>
+                                <p class="website">
+                                    <i class="fas fa-globe"></i><span><a target="_blank" href="<?php echo $website; ?>"><?php echo $website_txt ? $website_txt : $website; ?></a></span>
+                                </p>
+                            <?php endif ?>
+                            <?php if ($location['address']): ?>
+                                <p class="map_adress">
+                                    <i class="fas fa-map-marker-alt"></i><span><?php echo $location['address']; ?></span>
+                                </p>
+                            <?php endif ?>
+                            <?php if ($facebook): ?>
+                                <p class="facebook">
+                                    <i class="fab fa-facebook-f"></i><span><a target="_blank" href="<?php echo $facebook; ?>"><?php _e('Facebook', 'Wellbeing'); ?></a></span>
+                                </p>
+                            <?php endif ?>
+                            <?php if ($instagram): ?>
+                                <p class="instagram">
+                                    <i class="fab fa-instagram"></i><span><a target="_blank" href="<?php echo $instagram; ?>"><?php _e('Instagram', 'Wellbeing'); ?></a></span>
+                                </p>
+                            <?php endif ?>
+                            <?php if ($twitter): ?>
+                                <p class="twitter">
+                                    <i class="fab fa-twitter"></i><span><a target="_blank" href="<?php echo $twitter; ?>"><?php _e('Twitter', 'Wellbeing'); ?></a></span>
+                                </p>
+                              <?php endif ?>
+                            <?php if ($linkedin): ?>
+                                <p class="linkedin">
+                                    <i class="fab fa-linkedin-in"></i><span><a target="_blank" href="<?php echo $linkedin; ?>"><?php _e('LinkedIn', 'Wellbeing'); ?></a></span>
+                                </p>
+                            <?php endif ?>
+                            <?php if ($open_season): ?>
+                                <p class="open_season">
+                                    <span><b><?php _e('Opening season', 'Wellbeing'); ?></b>:</span> <span><?php echo $open_season; ?></span>
+                                </p>
+                            <?php endif ?>
+                            </div>
                             <?php endwhile; ?>
                         <?php endif; ?>
+                        <?php 
+                            $terms = get_the_terms( $post->ID, 'main_category' );
+                            if (!empty($terms)) {
+                                foreach ($terms as $term) {
+                                    $image = get_field('add_tax_icon', $term);
+                                    if (!empty($image)) {
+                                        echo "<div class='tax-img-holder-results tax-img-holder-single-post'><img src='" .$image. "' alt='Slide Image'></div>";
+                                    }       
+                                } 
+                            }
+                        ?>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-12">
                         <?php if( $location ): ?>
                             <h3 class="map-title"><?php _e('Where we are at:', 'Wellbeing'); ?></h3>
-                            <div class="acf-map" data-zoom="14">
+                            <div class="acf-map" data-zoom="8">
                                 <div class="marker" data-lat="<?php echo esc_attr($location['lat']); ?>" data-lng="<?php echo esc_attr($location['lng']); ?>"></div>
                             </div>
                         <?php endif; ?>
@@ -97,13 +317,13 @@
                 <?php while ( $the_query->have_posts() ) : $the_query->the_post(); ?>
                     <div class=col-md-6>
                         <div class="places-single-nereby">
-                            <a class="" href="<?php the_permalink(); ?>">
+                            <a class="show-hover-excerpt" href="<?php the_permalink(); ?>">
                                 <?php echo has_post_thumbnail() ? the_post_thumbnail('single_head_images') : '<img src="' . get_bloginfo( 'stylesheet_directory' )  . '/images/no-image.jpg" />';
-                                $taxonomies = get_object_taxonomies( (object) array( 'post_type' => get_post_type( get_the_ID() ) ));
+                                // $taxonomies = get_object_taxonomies( (object) array( 'post_type' => get_post_type( get_the_ID() ) ));
                                 // var_dump($taxonomies);
-                                foreach ($taxonomies as $taxonomy) {
+                                // foreach ($taxonomies as $taxonomy) {
                                     // var_dump($taxonomy);
-                                    $terms = get_the_terms( $post->ID, $taxonomy );
+                                    $terms = get_the_terms( $post->ID, 'main_category' );
                                     if (!empty($terms)) {
                                         foreach ($terms as $term) {
                                             $image = get_field('add_tax_icon', $term);
@@ -112,9 +332,15 @@
                                             }       
                                         } 
                                     }  
-                                }
+                                // }
                                 ?>
                                 <h3><?php echo get_the_title(); ?></h3>
+                                <?php if (get_field('small_description_home_page', $post->ID)): ?>
+                                <p class="display-hover">
+                                    <span class="show-excerpt"><?php echo get_field('small_description_home_page', $post->ID); ?></span>
+                                </p>
+                                <?php endif; ?>
+                                <span class="arrow-go-places lnr lnr-chevron-right"></span>
                             </a>
                         </div>
                     </div>
@@ -122,8 +348,8 @@
                 <?php wp_reset_postdata(); ?>
             <?php endif; ?>
         </div>    
-    </div>
     <?php } ?>
+    </div>
 </div>
 
 <style type="text/css">
